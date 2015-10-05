@@ -1,5 +1,5 @@
-from __future__ import print_function
-
+# -*- mode: python -*-
+# vi: set ft=python :
 import os
 import json
 
@@ -15,7 +15,6 @@ github_access_token = os.environ['GITHUB_ACCESS_TOKEN']
 headers = dict(Accept='application/vnd.github.v3+json',
                Authorization="token %s" % github_access_token)
 
-
 def api(url, verb='GET'):
     if not url.startswith(url_prefix):
         url = url_prefix + url
@@ -25,14 +24,10 @@ def collect_resource(endpoint):
     page = api(endpoint)
     if page.status_code > 399:
         raise ResourceNotAvailable(page.status_code)
-    next_ = page.links['next']
+    next_ = page.links.get('next', None)
     resource = json.loads(page.text)
     while next_:
         page = api(next_['url'])
         next_ = page.links.get('next', None)
         resource.extend(json.loads(page.text))
     return resource
-
-if __name__ == '__main__':
-    from pprint import pprint as pp
-    pp(collect_resource('orgs/refinery29/members'))
