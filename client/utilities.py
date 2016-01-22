@@ -15,10 +15,20 @@ github_access_token = os.environ['GITHUB_ACCESS_TOKEN']
 headers = dict(Accept='application/vnd.github.v3+json',
                Authorization="token %s" % github_access_token)
 
-def api(url, verb='GET'):
+def api(url, verb=None, json=None):
+    if json and not verb:
+        verb = 'POST'
+    elif not verb:
+        verb = 'GET'
+
     if not url.startswith(url_prefix):
         url = url_prefix + url
-    return requests.request(verb, url, headers=headers)
+
+    kwargs = dict(headers=headers)
+    if json:
+        kwargs['json'] = json
+
+    return requests.request(verb, url, **kwargs)
 
 def collect_resource(endpoint):
     page = api(endpoint)
@@ -31,3 +41,11 @@ def collect_resource(endpoint):
         next_ = page.links.get('next', None)
         resource.extend(json.loads(page.text))
     return resource
+
+def create_label(repo_name, label_name, color):
+    api(url_prefix + 'repos/' + repo_name + '/labels',
+        json=dict(name=label_name, color=color))
+
+def copy_labels(source_repo_name, target_repo_name):
+    for label in utilities.collect_resource('repos/' + source_repo_name + '/labels'):
+        utilities.create_label(target_repo_name, label['name'], label['color'])
