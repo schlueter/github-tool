@@ -47,5 +47,5 @@ def create_label(repo_name, label_name, color):
         json=dict(name=label_name, color=color))
 
 def copy_labels(source_repo_name, target_repo_name):
-    for label in utilities.collect_resource('repos/' + source_repo_name + '/labels'):
-        utilities.create_label(target_repo_name, label['name'], label['color'])
+    for label in collect_resource('repos/' + source_repo_name + '/labels'):
+        create_label(target_repo_name, label['name'], label['color'])
