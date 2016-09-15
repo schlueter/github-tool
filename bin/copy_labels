@@ -18,7 +18,7 @@ from __future__ import print_function
 import os
 import sys
 
-import yaml
+import json
 
 sys.path.append(os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
 from client import utilities
@@ -39,7 +39,7 @@ def main(args):
         if response.status_code > 399:
             if 'errors' in response.json() and 'already_exists' in [error['code'] for error in response.json()['errors']]:
                 print('Label "{}" already exists, nothing to do.'.format(
-                    yaml.load(response.request.body)['name']))
+                    json.loads(response.request.body)['name']))
             else:
                 print('Unknown error {} ({}).'.format(response.status_code, response.reason))
                 bad_status_codes.append(response.status_code)
