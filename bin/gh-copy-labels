@@ -15,13 +15,11 @@ See https://github.com/blog/1509-personal-api-tokens for instructions on obtaini
 
 from __future__ import print_function
 
-import os
 import sys
 
 import json
 
-sys.path.append(os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
-from client import utilities
+from github_api_client import utilities
 
 def usage():
     print(__doc__.format(sys.argv[0]))

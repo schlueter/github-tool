@@ -1,13 +1,14 @@
 #!/usr/bin/env python
+# pylint: disable=invalid-name
 
 """
-Copy all labels from one Github repo to another
+Create labels on a GitHub repository
 
 Usage:
-    {0} <source repo> <destination repo>
+    {0} <destination repo> <label name> <color>
 
 Example:
-    {0} schlueter/github-tool schlueter/seer
+    {0} schlueter/github-tool TODO ff8800
 
 Your GitHub API token will be read from the environment variable GITHUB_TOKEN.
 See https://github.com/blog/1509-personal-api-tokens for instructions on obtaining yours.
@@ -15,13 +16,11 @@ See https://github.com/blog/1509-personal-api-tokens for instructions on obtaini
 
 from __future__ import print_function
 
-import os
 import sys
 
 import json
 
-sys.path.append(os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
-from client import utilities
+from github_api_client import utilities
 
 def usage():
     print(__doc__.format(sys.argv[0]))
@@ -58,7 +57,7 @@ def parse_args(args):
 
     if '-h' in args or '--help' in args:
         usage()
-        exit
+        exit()
 
     return args[:2]
 
