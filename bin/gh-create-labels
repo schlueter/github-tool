@@ -1,0 +1,66 @@
+#!/usr/bin/env python
+
+"""
+Copy all labels from one Github repo to another
+
+Usage:
+    {0} <source repo> <destination repo>
+
+Example:
+    {0} schlueter/github-tool schlueter/seer
+
+Your GitHub API token will be read from the environment variable GITHUB_TOKEN.
+See https://github.com/blog/1509-personal-api-tokens for instructions on obtaining yours.
+"""
+
+from __future__ import print_function
+
+import os
+import sys
+
+import json
+
+sys.path.append(os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
+from client import utilities
+
+def usage():
+    print(__doc__.format(sys.argv[0]))
+
+def main(args):
+    args = parse_args(args)
+    try:
+        responses = utilities.copy_labels(*args)
+    except utilities.ResourceNotAvailable:
+        print('Rate limit exceeded, this is usually due to unauthenticated access. Try setting a GITHUB_TOKEN.', file=sys.stderr)
+        usage()
+        exit(2)
+    bad_status_codes = []
+    for response in responses:
+        if response.status_code > 399:
+            if 'errors' in response.json() and 'already_exists' in [error['code'] for error in response.json()['errors']]:
+                print('Label "{}" already exists, nothing to do.'.format(
+                    json.loads(response.request.body)['name']))
+            else:
+                print('Unknown error {} ({}).'.format(response.status_code, response.reason))
+                bad_status_codes.append(response.status_code)
+        else:
+            print('Label "{}" successfully created with color #{}.'.format(response.json()['name'], response.json()['color']))
+    if bad_status_codes:
+        exit(2)
+
+def parse_args(args):
+    # Drop script name
+    args = args[1:]
+
+    if len(args) < 2:
+        usage()
+        exit(1)
+
+    if '-h' in args or '--help' in args:
+        usage()
+        exit
+
+    return args[:2]
+
+if __name__ == '__main__':
+    main(sys.argv)
