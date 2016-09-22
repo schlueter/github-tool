@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# pylint: disable=invalid-name
 
 """
 Copy all labels from one Github repo to another
@@ -16,18 +17,22 @@ See https://github.com/blog/1509-personal-api-tokens for instructions on obtaini
 from __future__ import print_function
 
 import sys
-
 import json
 
 from github_api_client import utilities
 
+
 def usage():
     print(__doc__.format(sys.argv[0]))
+
+def copy_labels(source_repo_name, target_repo_name):
+    return [utilities.create_label(target_repo_name, label['name'], label['color']) for
+            label in utilities.collect_resource('repos/' + source_repo_name + '/labels')]
 
 def main(args):
     args = parse_args(args)
     try:
-        responses = utilities.copy_labels(*args)
+        responses = copy_labels(*args)
     except utilities.ResourceNotAvailable:
         print('Rate limit exceeded, this is usually due to unauthenticated access. Try setting a GITHUB_TOKEN.', file=sys.stderr)
         usage()
@@ -56,7 +61,7 @@ def parse_args(args):
 
     if '-h' in args or '--help' in args:
         usage()
-        exit
+        exit()
 
     return args[:2]
 
