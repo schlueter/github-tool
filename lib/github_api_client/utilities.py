@@ -1,17 +1,14 @@
 import os
-import json
+import json as JSON
 
 import requests
 
 
-url_prefix = 'https://api.github.com/'
-headers = dict(Accept='application/vnd.github.v3+json')
+URL_PREFIX = 'https://api.github.com/'
+HEADERS = dict(Accept='application/vnd.github.v3+json')
 
 if 'GITHUB_TOKEN' in os.environ:
-    headers['Authorization'] = "token %s" % os.environ['GITHUB_TOKEN']
-else:
-    # TODO make the api interaction display the api limit blocker
-    pass
+    HEADERS['Authorization'] = "token %s" % os.environ['GITHUB_TOKEN']
 
 class ResourceNotAvailable(Exception):
     pass
@@ -22,10 +19,10 @@ def api(url, verb=None, json=None):
     elif not verb:
         verb = 'GET'
 
-    if not url.startswith(url_prefix):
-        url = url_prefix + url
+    if not url.startswith(URL_PREFIX):
+        url = URL_PREFIX + url
 
-    kwargs = dict(headers=headers)
+    kwargs = dict(headers=HEADERS)
     if json:
         kwargs['json'] = json
 
@@ -36,20 +33,16 @@ def collect_resource(endpoint):
     if page.status_code > 399:
         raise ResourceNotAvailable(page.status_code)
     next_ = page.links.get('next', None)
-    resource = json.loads(page.text)
+    resource = JSON.loads(page.text)
     while next_:
         page = api(next_['url'])
         next_ = page.links.get('next', None)
-        resource.extend(json.loads(page.text))
+        resource.extend(JSON.loads(page.text))
     return resource
 
 def create_label(repo_name, label_name, color):
-    return api(url_prefix + 'repos/' + repo_name + '/labels',
-        json=dict(name=label_name, color=color))
-
-def copy_labels(source_repo_name, target_repo_name):
-    return [create_label(target_repo_name, label['name'], label['color']) for
-        label in collect_resource('repos/' + source_repo_name + '/labels')]
+    return api(URL_PREFIX + 'repos/' + repo_name + '/labels',
+               json=dict(name=label_name, color=color))
 
 def get_user_keys(username):
     return api('users/%s/keys' % username)
