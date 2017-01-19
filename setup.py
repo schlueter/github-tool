@@ -32,7 +32,4 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Topic :: Utilities',
     ],
-    scripts=[
-        'bin/gh-copy-labels',
-        'bin/gh-create-labels'
-    ])
+    scripts=[os.path.join('bin', f) for f in os.listdir('bin')])
