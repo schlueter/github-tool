@@ -1,0 +1,106 @@
+#!/usr/bin/env python
+
+
+import argparse
+import sys
+from typing import Optional
+
+from github_api_client import utilities
+
+
+SCRIPT_NAME = 'gh-repo-protection'
+
+
+class RepoAnalyzer:
+    repo_properties = [
+        'allow_merge_commit',
+        'allow_rebase_merge',
+        'allow_squash_merge',
+        'private',
+        'fork',
+        'forks_count',
+        'default_branch',
+        'open_issues_count',
+        'is_template',
+        'has_issues',
+        'has_projects',
+        'has_wiki',
+        'has_pages',
+        'has_downloads',
+        'archived',
+        'disabled',
+        'visibility',
+        'pushed_at',
+        'updated_at',
+        'created_at',
+        'template_repository'
+    ]
+
+    branch_properties = ['name', 'protected']
+    protected_branch_properties = {
+        'required_status_checks': ['strict', 'contexts'],
+        'enforce_admins': ['enabled'],
+        'required_pull_request_reviews': ([
+            'dismiss_stale_reviews',
+            'require_code_owner_reviews',
+            'required_approving_review_count'
+
+        ], {
+            'dismissal_restrictions': {
+                'users': ['login'],
+                'teams': ['name']
+            }
+        })
+    }
+
+    def __init__(self, output_format: str = 'json') -> None:
+        self.output_format = output_format
+
+    def consider_repos(
+        self: object,
+        org: Optional[str] = None,
+        user: Optional[str] = None,
+        repo: Optional[str] = None
+      ) -> None:
+        if org is not None:
+            repos_path = f"/orgs/{org}/repos"
+        elif user is not None:
+            repos_path = f"/users/{user}/repos"
+        else:
+            raise Exception(
+                'In `consider repos` an org or user must be provided'
+            )
+        if repo is not None:
+            self.consider_repo(f"/repos/{org or user}/{repo}")
+            return
+        repos = utilities.collect_resource(repos_path).json()
+        for repo in [repo['name'] for repo in repos]:
+            self.consider_repo(f"/repos/{org or user}/{repo}"
+
+
+    def consider_repo(self, path: str) -> None:
+        pass
+
+
+def get_argparser(name: str) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(name)
+    parser.add_argument('-r', '--repository', required=False)
+    parser.add_argument('-o', '--organization', required=False)
+    parser.add_argument('-u', '--user', required=False)
+    parser.add_argument('-f', '--output-format', choices=['csv', 'json'])
+    return parser
+
+
+def main(args: list) -> None:
+    argparser = get_argparser(SCRIPT_NAME)
+    parsed_args = argparser.parse_args(args)
+
+    if not (parsed_args.organization or parsed_args.user):
+        argparser.exit(1, 'Either an organization or a user must be specified')
+
+    analyzer = RepoAnalyzer(output=argparser.output_format)
+    print(analyzer.consider_repos(parsed_args))
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
