@@ -9,7 +9,15 @@ import requests
 
 
 URL_PREFIX = 'https://api.github.com/'
-HEADERS = dict(Accept='application/vnd.github.v3+json')
+ACCEPT_HEADERS = [
+    # Current version of API
+    'application/vnd.github.v3+json',
+    # Protected branches required number of approving pull requests
+    'application/vnd.github.luke-cage-preview+json',
+    # Protected branches signed commits requirement
+    'application/vnd.github.zzzax-preview+json'
+]
+HEADERS = dict(accept=','.join(ACCEPT_HEADERS))
 
 if 'GITHUB_TOKEN' in os.environ:
     HEADERS['Authorization'] = "token %s" % os.environ['GITHUB_TOKEN']
