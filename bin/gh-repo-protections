@@ -101,6 +101,7 @@ class RepoAnalyzer:
                         f"with {branch_response.status_code}: "
                         f"{branch_response.json()}"
                     )
+                    repo_info['branches'].append(branch_info)
                     continue
                 branch_info = {**branch_info, **branch_response.json()}
                 del branch_info['url']
