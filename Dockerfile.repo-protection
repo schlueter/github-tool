@@ -1,0 +1,8 @@
+# Latest stable python, 3.8.3 at time of authoring
+FROM python:alpine
+
+WORKDIR package
+COPY . .
+RUN pip install .
+CMD gh-repo-protections -o "$ORG" -u "$USER" -r "$REPO"
+

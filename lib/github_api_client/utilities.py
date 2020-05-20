@@ -64,7 +64,9 @@ def collect_resource(endpoint: str):
     """
     page = api(endpoint)
     if page.status_code > 399:
-        raise ResourceNotAvailable(page.status_code)
+        raise ResourceNotAvailable(
+            f"requesting {endpoint} resulted in {page.status_code}"
+        )
     next_ = page.links.get('next', None)
     resource = JSON.loads(page.text)
     while next_:

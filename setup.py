@@ -3,8 +3,9 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('lib'))
-from release import __version__, __author__ # pylint: disable=import-error
+sys.path.insert(1, os.path.abspath('lib'))
+
+from release import __version__, __author__
 from setuptools import setup, find_packages
 
 
@@ -32,4 +33,5 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Topic :: Utilities',
     ],
-    scripts=[os.path.join('bin', f) for f in os.listdir('bin')])
+    scripts=[os.path.join('bin', f) for f in os.listdir('bin')]
+)
