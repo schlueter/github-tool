@@ -48,19 +48,19 @@ class RepoAnalyzer:
 
     def consider_repos(
           self: object,
-          org: Optional[str] = None,
-          user: Optional[str] = None,
-          repo: Optional[str] = None
+          org: str = '',
+          user: str = '',
+          repo: str = ''
       ) -> None:
-        if org is not None:
+        if org:
             repos_path = f"orgs/{org}/repos"
-        elif user is not None:
+        elif user:
             repos_path = f"users/{user}/repos"
         else:
             raise Exception(
                 'In `consider_repos` an org or user must be provided'
             )
-        if repo is not None:
+        if repo:
             self.consider_repo(f"{org or user}/{repo}")
             return
         repos = utilities.collect_resource(repos_path)
