@@ -1,0 +1,48 @@
+#!/usr/bin/env python
+"""
+Generate an analysis of GitHub repository security.
+"""
+import argparse
+import json
+import sys
+from datetime import datetime
+from typing import List
+
+from github_api_client import utilities
+
+
+def generate_repo_analysis(repo_info: List[dict]):
+    allow_merge_commit = []
+    allow_rebase_merge = []
+    allow_squash_merge = []
+    disallow_merge_commit = []
+    disallow_rebase_merge = []
+    disallow_squash_merge = []
+
+    archived = []
+    disabled = []
+
+    public = []
+    private = []
+
+    forks = []
+    forked = []
+
+    non_master_default_branch = []
+
+    protected = []
+    unprotected = []
+
+    update_within = {}
+
+    for repo in repo_info:
+        pass
+
+
+def main(args: List[str]):
+    repo_info = json.load(open(args[0]))
+    generate_markdown_repo_analysis(repo_info)
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])

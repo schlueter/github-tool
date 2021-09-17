@@ -4,46 +4,46 @@
 import argparse
 import json
 import sys
-from typing import Optional, Union
-
-import requests
+from typing import List
 
 from github_api_client import utilities
 
 
 SCRIPT_NAME = 'gh-repo-protection'
 
-def stderr(*args):
+
+def stderr(*args: List[str]):
     print(*args, file=sys.stderr)
 
+
 REPO_PROPERTIES = [
-    'full_name',
     'allow_merge_commit',
     'allow_rebase_merge',
     'allow_squash_merge',
-    'private',
+    'archived',
+    'created_at',
+    'default_branch',
+    'disabled',
     'fork',
     'forks_count',
-    'default_branch',
-    'open_issues_count',
-    'is_template',
+    'full_name',
+    'has_downloads',
     'has_issues',
+    'has_pages',
     'has_projects',
     'has_wiki',
-    'has_pages',
-    'has_downloads',
-    'archived',
-    'disabled',
-    'visibility',
+    'is_template',
+    'open_issues_count',
+    'private',
     'pushed_at',
-    'updated_at',
-    'created_at',
     'template_repository'
+    'updated_at',
+    'visibility',
 ]
 
 
 class RepoAnalyzer:
-    def __init__(self) -> None:
+    def __init__(self: object) -> None:
         self.repos = []
 
     def consider_repos(
@@ -67,7 +67,7 @@ class RepoAnalyzer:
         for repo in [repo['name'] for repo in repos]:
             self.consider_repo(f"{org or user}/{repo}")
 
-    def consider_repo(self, path: str) -> None:
+    def consider_repo(self: object, path: str) -> None:
         stderr(f"Considering {path}")
         repo_path = f"repos/{path}"
         repo_response = utilities.api(repo_path)
