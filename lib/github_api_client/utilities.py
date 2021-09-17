@@ -10,8 +10,10 @@ HEADERS = dict(Accept='application/vnd.github.v3+json')
 if 'GITHUB_TOKEN' in os.environ:
     HEADERS['Authorization'] = "token %s" % os.environ['GITHUB_TOKEN']
 
+
 class ResourceNotAvailable(Exception):
     pass
+
 
 def api(url, verb=None, json=None, headers={}):
     if json and not verb:
@@ -28,6 +30,7 @@ def api(url, verb=None, json=None, headers={}):
 
     return requests.request(verb, url, **kwargs)
 
+
 def collect_resource(endpoint):
     page = api(endpoint)
     if page.status_code > 399:
@@ -40,9 +43,11 @@ def collect_resource(endpoint):
         resource.extend(JSON.loads(page.text))
     return resource
 
+
 def create_label(repo_name, label_name, color):
     return api('repos/' + repo_name + '/labels',
                json=dict(name=label_name, color=color))
+
 
 def update_label(repo_name, current_name, new_name=None, new_color=None, new_description=None):
     payload = dict()
@@ -56,5 +61,6 @@ def update_label(repo_name, current_name, new_name=None, new_color=None, new_des
                json=payload,
                headers=dict(Accept='application/vnd.github.symmetra-preview+json'))
 
+
 def get_user_keys(username):
-    return api('users/%s/keys' % username)
+    return api(f"users/{username}/keys")
